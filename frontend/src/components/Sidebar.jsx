@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, Clock, Activity, LogOut } from 'lucide-react';
-import { useContext } from 'react';
+import { Calendar, Clock, Activity, LogOut, BarChart2 } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 
 // Componente de barra lateral (Sidebar)
@@ -28,6 +27,12 @@ const Sidebar = () => {
   if (user?.rol === 'Profesional') {
     navItems.push(
       { name: 'Agenda Clínica', path: '/clinico', icon: Calendar }
+    );
+  }
+
+  if (user?.rol === 'Jefatura') {
+    navItems.push(
+      { name: 'Reportería', path: '/jefatura', icon: BarChart2 }
     );
   }
 

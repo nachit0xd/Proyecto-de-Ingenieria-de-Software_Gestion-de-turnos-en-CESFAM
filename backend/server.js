@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth');
 const turnosRoutes = require('./routes/turnos');
 const adminRoutes = require('./routes/admin');
 const clinicoRoutes = require('./routes/clinico');
+const jefaturaRoutes = require('./routes/jefatura');
 
 const app = express();
 const server = http.createServer(app);
@@ -36,6 +37,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/turnos', turnosRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/clinico', clinicoRoutes);
+app.use('/api/jefatura', jefaturaRoutes);
 
 // Manejo de websockets
 io.on('connection', (socket) => {
