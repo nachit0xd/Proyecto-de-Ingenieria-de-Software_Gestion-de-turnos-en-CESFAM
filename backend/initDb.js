@@ -54,11 +54,11 @@ db.serialize(() => {
         const insertUsuario = db.prepare('INSERT OR IGNORE INTO usuarios (rut, nombre, contrasena, rol, email, telefono) VALUES (?, ?, ?, ?, ?, ?)');
         
         const seedUsers = [
-            ['12345678-9', 'Paciente Prueba', '123456', 'Paciente', 'paciente@test.cl', '+56911111111'],
-            ['9876543-2', 'Admin Prueba', 'admin123', 'Administrativo', 'admin@cesfam.cl', '+56922222222'],
-            ['11111111-1', 'Dr. Profesional Soto', 'prof123', 'Profesional', 'soto@cesfam.cl', '+56933333333'],
-            ['22222222-2', 'Dra. Profesional Vega', 'prof123', 'Profesional', 'vega@cesfam.cl', '+56944444444'],
-            ['99999999-9', 'Jefe Director', 'jefe123', 'Jefatura', 'jefe@cesfam.cl', '+56955555555']
+            ['12.345.678-9', 'Paciente Prueba', '123456', 'Paciente', 'paciente@test.cl', '+56911111111'],
+            ['9.876.543-2', 'Admin Prueba', 'admin123', 'Administrativo', 'admin@cesfam.cl', '+56922222222'],
+            ['11.111.111-1', 'Dr. Profesional Soto', 'prof123', 'Profesional', 'soto@cesfam.cl', '+56933333333'],
+            ['22.222.222-2', 'Dra. Profesional Vega', 'prof123', 'Profesional', 'vega@cesfam.cl', '+56944444444'],
+            ['99.999.999-9', 'Jefe Director', 'jefe123', 'Jefatura', 'jefe@cesfam.cl', '+56955555555']
         ];
 
         for (const user of seedUsers) {
@@ -76,6 +76,15 @@ db.serialize(() => {
                     const stmtTurnos = db.prepare("INSERT OR IGNORE INTO turnos (id_profesional, id_especialidad, fecha_hora, estado) VALUES (?, ?, ?, 'Libre')");
                     const now = new Date();
                     
+                    // Turnos para HOY (Para probar el panel de admisión diario)
+                    const tHoy1 = new Date();
+                    tHoy1.setHours(tHoy1.getHours() + 1, 0, 0, 0); // En 1 hora más
+                    stmtTurnos.run(prof.id, 1, tHoy1.toISOString()); // Medicina General
+
+                    const tHoy2 = new Date();
+                    tHoy2.setHours(tHoy2.getHours() + 2, 0, 0, 0); // En 2 horas más
+                    stmtTurnos.run(prof.id, 2, tHoy2.toISOString()); // Odontología
+
                     // Turnos para mañana
                     const t1 = new Date(now.getTime() + 24 * 60 * 60 * 1000);
                     t1.setHours(9, 0, 0, 0);

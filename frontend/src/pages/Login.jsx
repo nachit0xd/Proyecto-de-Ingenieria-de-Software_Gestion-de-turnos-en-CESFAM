@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { Activity } from 'lucide-react'; 
 import { formatRut } from '../utils/formatters';
 
+// Página de inicio de sesión
 const Login = () => {
   const [rut, setRut] = useState('');
   const [contrasena, setContrasena] = useState('');
