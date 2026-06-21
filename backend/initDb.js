@@ -69,7 +69,39 @@ db.serialize(() => {
         
         insertUsuario.finalize(() => {
             console.log('Datos semilla (usuarios con hash) insertados.');
-            db.close();
+            
+            // Insertar turnos semilla
+            db.get("SELECT id FROM usuarios WHERE rol = 'Profesional' LIMIT 1", (err, prof) => {
+                if (prof) {
+                    const stmtTurnos = db.prepare("INSERT OR IGNORE INTO turnos (id_profesional, id_especialidad, fecha_hora, estado) VALUES (?, ?, ?, 'Libre')");
+                    const now = new Date();
+                    
+                    // Turnos para mañana
+                    const t1 = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                    t1.setHours(9, 0, 0, 0);
+                    stmtTurnos.run(prof.id, 1, t1.toISOString()); // Medicina General
+                    
+                    const t2 = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                    t2.setHours(10, 0, 0, 0);
+                    stmtTurnos.run(prof.id, 2, t2.toISOString()); // Odontología
+
+                    // Turnos para la proxima semana
+                    const t3 = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    t3.setHours(11, 30, 0, 0);
+                    stmtTurnos.run(prof.id, 1, t3.toISOString()); // Medicina General
+                    
+                    const t4 = new Date(now.getTime() + 8 * 24 * 60 * 60 * 1000);
+                    t4.setHours(14, 0, 0, 0);
+                    stmtTurnos.run(prof.id, 3, t4.toISOString()); // Psicología
+
+                    stmtTurnos.finalize(() => {
+                        console.log('Turnos semilla insertados.');
+                        db.close();
+                    });
+                } else {
+                    db.close();
+                }
+            });
         });
     });
 });
