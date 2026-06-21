@@ -4,14 +4,26 @@ import { Calendar, Clock, Activity, LogOut } from 'lucide-react';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
+// Componente de barra lateral (Sidebar)
 const Sidebar = () => {
   const location = useLocation();
   const { logout, user } = useContext(AuthContext);
 
-  const navItems = [
-    { name: 'Agendar Hora', path: '/agendar', icon: Calendar },
-    { name: 'Mis Turnos', path: '/mis-turnos', icon: Clock },
-  ];
+  const navItems = [];
+
+  // Agregar enlaces de navegación según el rol del usuario
+  if (user?.rol === 'Paciente') {
+    navItems.push(
+      { name: 'Agendar Hora', path: '/agendar', icon: Calendar },
+      { name: 'Mis Turnos', path: '/mis-turnos', icon: Clock }
+    );
+  }
+
+  if (user?.rol === 'Administrativo' || user?.rol === 'Jefatura') {
+    navItems.push(
+      { name: 'Panel Admisión', path: '/admision', icon: Calendar }
+    );
+  }
 
   return (
     <div style={{ width: '250px', backgroundColor: 'var(--white)', borderRight: '1px solid #e2e8f0', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 
 import { formatRut, formatDate } from '../utils/formatters';
 
+// Página de registro de nuevos pacientes
 const Register = () => {
   const [formData, setFormData] = useState({
     rut: '',

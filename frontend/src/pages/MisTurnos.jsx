@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import { Calendar, User, Clock, AlertCircle } from 'lucide-react';
 
+// Página para mostrar los turnos del paciente
 const MisTurnos = () => {
   const [turnos, setTurnos] = useState([]);
   const [loading, setLoading] = useState(false);

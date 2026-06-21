@@ -3,6 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import { Calendar, User, Search, CheckCircle } from 'lucide-react';
 
+// Página para agendar horas (solo para pacientes)
 const AgendarHora = () => {
   const { user } = useContext(AuthContext);
   const [turnos, setTurnos] = useState([]);
