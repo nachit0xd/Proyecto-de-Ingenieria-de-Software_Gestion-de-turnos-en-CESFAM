@@ -7,6 +7,7 @@ import AgendarHora from './pages/AgendarHora';
 import MisTurnos from './pages/MisTurnos';
 import PanelAdmision from './pages/PanelAdmision';
 import PanelClinico from './pages/PanelClinico';
+import PanelJefatura from './pages/PanelJefatura';
 import './index.css';
 
 // Componente para proteger rutas según autenticación y rol
@@ -20,8 +21,9 @@ const PrivateRoute = ({ children, allowedRoles }) => {
     // Si no tiene el rol, llevarlo a su inicio por defecto
     let defaultPath = "/";
     if (user.rol === 'Paciente') defaultPath = "/agendar";
-    else if (user.rol === 'Administrativo' || user.rol === 'Jefatura') defaultPath = "/admision";
+    else if (user.rol === 'Administrativo') defaultPath = "/admision";
     else if (user.rol === 'Profesional') defaultPath = "/clinico";
+    else if (user.rol === 'Jefatura') defaultPath = "/jefatura";
     
     return <Navigate to={defaultPath} />;
   }
@@ -66,6 +68,12 @@ const App = () => {
           <Route path="/clinico" element={
             <PrivateRoute allowedRoles={['Profesional']}>
               <PanelClinico />
+            </PrivateRoute>
+          } />
+
+          <Route path="/jefatura" element={
+            <PrivateRoute allowedRoles={['Jefatura']}>
+              <PanelJefatura />
             </PrivateRoute>
           } />
         </Routes>
