@@ -25,6 +25,12 @@ const Sidebar = () => {
     );
   }
 
+  if (user?.rol === 'Profesional') {
+    navItems.push(
+      { name: 'Agenda Clínica', path: '/clinico', icon: Calendar }
+    );
+  }
+
   return (
     <div style={{ width: '250px', backgroundColor: 'var(--white)', borderRight: '1px solid #e2e8f0', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>
