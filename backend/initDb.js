@@ -1,4 +1,5 @@
 const db = require('./db');
+const bcrypt = require('bcrypt');
 
 const initSQL = `
 -- Tabla de Usuarios
@@ -34,7 +35,7 @@ CREATE TABLE IF NOT EXISTS turnos (
 `;
 
 db.serialize(() => {
-    db.exec(initSQL, (err) => {
+    db.exec(initSQL, async (err) => {
         if (err) {
             console.error('Error al inicializar las tablas:', err.message);
             return;
@@ -49,19 +50,25 @@ db.serialize(() => {
         });
         insertEspecialidad.finalize();
         
-        // Insertar datos semilla (Usuarios de prueba)
-        // NOTA: Las contraseñas aquí están en texto plano por simplicidad del script de semilla,
-        // pero en producción (Sprint 1) se utilizará bcrypt como indica el plan.
+        // Función auxiliar para hashear contraseñas e insertarlas
         const insertUsuario = db.prepare('INSERT OR IGNORE INTO usuarios (rut, nombre, contrasena, rol, email, telefono) VALUES (?, ?, ?, ?, ?, ?)');
         
-        insertUsuario.run('12345678-9', 'Paciente Prueba', '123456', 'Paciente', 'paciente@test.cl', '+56911111111');
-        insertUsuario.run('9876543-2', 'Admin Prueba', 'admin123', 'Administrativo', 'admin@cesfam.cl', '+56922222222');
-        insertUsuario.run('11111111-1', 'Dr. Profesional Soto', 'prof123', 'Profesional', 'soto@cesfam.cl', '+56933333333');
-        insertUsuario.run('22222222-2', 'Dra. Profesional Vega', 'prof123', 'Profesional', 'vega@cesfam.cl', '+56944444444');
-        insertUsuario.run('99999999-9', 'Jefe Director', 'jefe123', 'Jefatura', 'jefe@cesfam.cl', '+56955555555');
+        const seedUsers = [
+            ['12345678-9', 'Paciente Prueba', '123456', 'Paciente', 'paciente@test.cl', '+56911111111'],
+            ['9876543-2', 'Admin Prueba', 'admin123', 'Administrativo', 'admin@cesfam.cl', '+56922222222'],
+            ['11111111-1', 'Dr. Profesional Soto', 'prof123', 'Profesional', 'soto@cesfam.cl', '+56933333333'],
+            ['22222222-2', 'Dra. Profesional Vega', 'prof123', 'Profesional', 'vega@cesfam.cl', '+56944444444'],
+            ['99999999-9', 'Jefe Director', 'jefe123', 'Jefatura', 'jefe@cesfam.cl', '+56955555555']
+        ];
+
+        for (const user of seedUsers) {
+            const [rut, nombre, passPlana, rol, email, telefono] = user;
+            const hash = await bcrypt.hash(passPlana, 10);
+            insertUsuario.run(rut, nombre, hash, rol, email, telefono);
+        }
         
         insertUsuario.finalize(() => {
-            console.log('Datos semilla insertados.');
+            console.log('Datos semilla (usuarios con hash) insertados.');
             db.close();
         });
     });
