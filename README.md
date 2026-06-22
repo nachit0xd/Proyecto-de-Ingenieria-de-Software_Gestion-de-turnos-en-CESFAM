@@ -1,68 +1,107 @@
-# Sistema de Gestión de Turnos CESFAM (SGT-CESFAM)
+# SGT-CESFAM (Sistema de Gestión de Turnos)
 
-Plataforma de software web responsive multi-rol orientada a digitalizar y centralizar el ciclo completo de gestión de turnos dentro de un Centro de Salud Familiar.
+- **Integrantes:** Eduardo Marin, Francisco Quiroga, Ignacio Carrillo
+- **Curso:** Ingeniería de Software - ICI4244
 
-Este documento se centra especificamente en la arquitectura y el stack tecnológico del proyecto. Para revisar el detalle teórico de planificación y desarrollo, revise el documento adjunto `Proyecto de Asignatura_ Gestión de turnos en CESFAM.pdf` en la carpeta principal del repositorio.
+---
 
-## Arquitectura y Stack Tecnológico
+Bienvenido a SGT-CESFAM, una plataforma integral diseñada para optimizar y digitalizar el ciclo completo de atención en un Centro de Salud Familiar. Este proyecto fue desarrollado como entrega final de la asignatura de Ingeniería de Software.
 
-El proyecto está diseñado para funcionar como un prototipo rápido, liviano y escalable.
+## Características Principales
 
-- **Frontend**: SPA desarrollada en React.js, inicializada con Vite.
-  - Diseño implementado puramente en **Vanilla CSS**, asegurando alta mantenibilidad sin depender de librerías externas.
-  - Interfaz orientada a la experiencia de usuario (usabilidad) mediante Glassmorphism y micro-interacciones.
-- **Backend**: API REST en Node.js utilizando el framework Express.
-- **Base de Datos**: SQLite, permitiendo un desarrollo local simple sin necesidad de contenedores adicionales ni servidores externos, mientras retiene la integridad relacional para transacciones y control de concurrencia.
+El sistema está dividido en cuatro módulos principales con control de acceso basado en roles (RBAC):
 
-## Estructura del Proyecto
+1. **Módulo Paciente:**
+   - Auto-registro seguro con validación y formateo automático de RUT chileno.
+   - Agendamiento de horas filtrado por especialidad.
+   - Cancelación o reprogramación de horas sujeto a **reglas estrictas de 24 horas de anticipación**.
 
+2. **Módulo de Admisión (Mesón):**
+   - Agenda diaria centralizada para el control de flujo.
+   - **Registro de Check-in** que emite notificaciones en tiempo real al box del médico.
+   - Asignación manual de horas de emergencia (excluidas de la regla de 24 horas).
+
+3. **Módulo Clínico (Profesional):**
+   - Recepción mágica (mediante WebSockets) de las alertas de "pacientes en sala de espera".
+   - Panel de flujo de trabajo ordenado por prioridad de asistencia.
+   - Transición de estados médicos: "Atendido" o "Inasistencia".
+
+4. **Módulo de Reportes (Jefatura):**
+   - Dashboard interactivo utilizando gráficos (Recharts).
+   - KPIs de tasas de inasistencias y volumen de demanda por especialidad médica.
+
+---
+
+## Stack Tecnológico
+
+**Frontend:**
+- [React](https://reactjs.org/) + [Vite](https://vitejs.dev/)
+- Vanilla CSS (Metodología BEM / Tokens CSS modernos)
+- `lucide-react` para iconografía.
+- `recharts` para despliegue de métricas directivas.
+- `socket.io-client` para notificaciones en tiempo real.
+
+**Backend:**
+- [Node.js](https://nodejs.org/) con [Express](https://expressjs.com/)
+- [SQLite3](https://www.sqlite.org/) como motor de base de datos relacional (ligero y transaccional).
+- `bcrypt` para el hasheo de contraseñas.
+- `jsonwebtoken` para control de sesiones (JWT).
+- `socket.io` para habilitar salas privadas y eventos en vivo.
+
+---
+
+## Instrucciones de Instalación y Ejecución
+
+Sigue estos pasos para clonar el proyecto e inicializar el servidor local.
+
+### 1. Clonar el Repositorio
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd Proyecto-de-Ingenieria-de-Software_Gestion-de-turnos-en-CESFAM
 ```
-.
-├── backend/            # API REST (Node.js/Express)
-│   ├── cesfam.sqlite   # Archivo de base de datos local
-│   ├── db.js           # Configuración de conexión SQLite
-│   ├── initDb.js       # Script de inicialización y datos semilla
-│   ├── package.json
-│   └── (Futuros controladores y rutas)
-├── frontend/           # Interfaz de Usuario (React + Vite)
-│   ├── index.html
-│   ├── package.json
-│   ├── src/
-│   │   ├── index.css   # Sistema de diseño base (Vanilla CSS)
-│   │   ├── App.jsx     # Componente raíz
-│   │   └── (Futuros componentes, vistas y hooks)
-└── README.md
-```
 
-## Ejecución Local
-
-Para levantar este proyecto en un entorno de desarrollo local, sigue estos pasos:
-
-### Backend
-Navega a la carpeta `backend`:
+### 2. Configuración del Backend
 ```bash
 cd backend
 npm install
 ```
-Inicializa la base de datos (solo la primera vez):
+Antes de ejecutar el servidor, debemos inicializar y sembrar la base de datos local de SQLite con datos ficticios para poder probar la plataforma:
 ```bash
 node initDb.js
 ```
-*Nota: El script poblará la base de datos con algunos perfiles de usuario por defecto (Paciente, Administrativo, Profesional, Jefatura).*
+Finalmente, levanta el servidor backend (que correrá en el puerto `3001`):
+```bash
+npm run dev
+# o usando node nativo: node server.js
+```
 
-### Frontend
-En otra terminal, navega a la carpeta `frontend`:
+### 3. Configuración del Frontend
+Abre una nueva terminal, vuelve a la raíz del proyecto y navega hacia la carpeta del cliente:
 ```bash
 cd frontend
 npm install
+```
+Levanta la interfaz web (usualmente disponible en `http://localhost:5173`):
+```bash
 npm run dev
 ```
-Esto iniciará el servidor de desarrollo de Vite (normalmente en `http://localhost:5173`).
 
-## Modelo de Datos
+---
 
-La base de datos relacional (SQLite) contiene las siguientes entidades principales:
+## Credenciales de Prueba (Semilla)
 
-- **Usuarios (`usuarios`)**: Centraliza los perfiles de los 4 actores del sistema mediante el campo `rol`. Almacena credenciales (RUT, contraseña, información de contacto).
-- **Especialidades (`especialidades`)**: Define el catálogo de atenciones del CESFAM (ej. Medicina General, Odontología).
-- **Turnos (`turnos`)**: Tabla transaccional central que cruza un `id_profesional`, `id_especialidad`, `fecha_hora` e `id_paciente`. Su estado puede transicionar entre 'Libre', 'Agendado', 'Presente', 'Atendido', 'Cancelado', etc.
+El script `initDb.js` genera perfiles pre-configurados para que el equipo evaluador pueda probar todo el flujo sin necesidad de crear nuevas cuentas.
+
+| Rol | RUT | Contraseña | Propósito |
+| :--- | :--- | :--- | :--- |
+| **Paciente** | `12.345.678-9` | `123456` | Probar registro, reserva y reglas de cancelación de 24h. |
+| **Administrativo** | `9.876.543-2` | `admin123` | Probar el panel de mesón, asignación manual y emitir Check-in. |
+| **Profesional** | `11.111.111-1` | `prof123` | Dr. Soto. Probar la agenda clínica y recepción del pop-up de Check-in. |
+| **Jefatura** | `99.999.999-9` | `jefe123` | Probar el módulo de métricas, PieCharts y BarCharts en vivo. |
+
+---
+
+## Reglas de Negocio Implementadas
+* El sistema es estrictamente transaccional. SQLite bloquea reservas concurrentes a través de `UPDATE WHERE estado = 'Libre'`.
+* La regla de anulación es inflexible en el lado del cliente (Backend retorna 403 Forbidden si faltan menos de 24 horas).
+* El sistema usa WebSockets divididos por `rooms` para evitar que un traumatólogo reciba la notificación de un paciente de odontología.
