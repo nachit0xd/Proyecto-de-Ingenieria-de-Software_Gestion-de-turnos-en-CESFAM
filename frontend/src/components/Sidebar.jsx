@@ -47,7 +47,7 @@ const Sidebar = () => {
 
       <nav style={{ flex: 1, padding: '1.5rem 1rem' }}>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '1rem', letterSpacing: '0.05em' }}>
-          Módulo Paciente
+          Módulo {user?.rol || 'Principal'}
         </p>
         <ul style={{ listStyle: 'none' }}>
           {navItems.map((item) => {
